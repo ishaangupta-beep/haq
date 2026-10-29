@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { requireKey } from "@/lib/auth";
 import { startAdvocate, startCallback, draftEscalation } from "@/lib/workflow";
 
 export const dynamic = "force-dynamic";
@@ -7,6 +8,8 @@ export const dynamic = "force-dynamic";
 // POST /api/cases/:id/callback                       — call the customer back now
 // POST /api/cases/:id/escalate                       — draft the National Consumer Helpline complaint
 export async function POST(req: Request, ctx: { params: Promise<{ id: string; action: string }> }) {
+  const denied = requireKey(req);
+  if (denied) return denied;
   const params = await ctx.params;
   const body = await req.json().catch(() => ({}));
   try {

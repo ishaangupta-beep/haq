@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { requireKey } from "@/lib/auth";
 import { db, logEvent } from "@/lib/supabase";
 import { env } from "@/lib/env";
 import { parseAmount, policyFor } from "@/lib/core";
@@ -7,7 +8,9 @@ import { startAdvocate } from "@/lib/workflow";
 export const dynamic = "force-dynamic";
 
 // GET /api/cases — list for the dashboard
-export async function GET() {
+export async function GET(req: Request) {
+  const denied = requireKey(req);
+  if (denied) return denied;
   const { data, error } = await db().from("cases").select("*").order("created_at", { ascending: false }).limit(100);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json(data);
@@ -15,6 +18,8 @@ export async function GET() {
 
 // POST /api/cases — create a case from the web form (fallback to the phone intake)
 export async function POST(req: Request) {
+  const denied = requireKey(req);
+  if (denied) return denied;
   const b = await req.json().catch(() => null);
   if (!b?.company || !b?.customer_phone) {
     return NextResponse.json({ error: "company and customer_phone are required" }, { status: 400 });

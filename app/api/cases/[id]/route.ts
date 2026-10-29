@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
+import { requireKey } from "@/lib/auth";
 import { db } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
 // GET /api/cases/:id — case + its calls + timeline
-export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> }) {
+export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }) {
+  const denied = requireKey(req);
+  if (denied) return denied;
   const params = await ctx.params;
   const supa = db();
   const [c, calls, events] = await Promise.all([
