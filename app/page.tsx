@@ -405,6 +405,7 @@ function CaseView(props: {
             {props.busy === "callback" ? "Calling…" : "Call customer with result"}
           </button>
         )}
+        <a className="btn ghost" href={`/track/${c.id}`} target="_blank" rel="noreferrer">Customer's tracking page</a>
         {showEscalate && (
           <button className="btn ghost" onClick={props.onEscalate} disabled={!!props.busy}>
             {props.busy === "escalate" ? "Drafting…" : "Draft consumer helpline complaint"}
